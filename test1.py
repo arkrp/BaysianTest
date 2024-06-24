@@ -1,6 +1,10 @@
 import numpy as np
 random = np.random.default_rng()
 def main():
+    """
+    This test represents the scenario where C is dependent on B and B is dependent on A. This represens the absolute simplest propagation using baysian inference.
+    A -> B -> C
+    """
     #  define our connections!
     PB_A = random.uniform(0,1)
     PB_NA = random.uniform(0,1)
