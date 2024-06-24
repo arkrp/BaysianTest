@@ -64,11 +64,5 @@ def main():
     #print(f'          P(~A|C)={1 - PA_C_3:.4f}')
     # 
     # 
-    # CONCLUSION
-    """
-    As far as I can tell, simply cascading the probability updates backwards using only the updated probabilities results in a failure. That is, naive cascading of the probabilities does not effectively capture the true probabilities which a full baysian model would. Interestingly, the naive cascade does seem to act as a rough approximate of the true distribution, But its rougher than the true method, which seems to have a similar computational complexity.
-
-    This is problematic, because the cascading model was the one which could be most effectively generalized backwards AND forwards. I guess I'll have to keep searching in order to understand these properties better!
-    """
 if __name__ == '__main__':
     main()
