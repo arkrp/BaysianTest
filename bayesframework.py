@@ -14,9 +14,11 @@ Notes: initialize_prior is only intended to be used on the root node, all other 
 
 """
 #TODO implement viturbi's algorithm so we can also find the most likely hidden states.
+#TODO implement a random state creator 
 # 
 import numpy as np
 from dataclasses import dataclass, field
+import warnings
 @dataclass
 class Node(): #  
     #  attributes!
@@ -24,6 +26,7 @@ class Node(): #  
     distribution: np.array = field(init=False, default=None)
     observation: int = field(init=False, default=None)
     number_of_catagories = field(kw_only=True, default=None)
+    is_root_node = field(kw_only=True, default=True)
     # 
     def add_connection(self, emission_matrix: np.array) -> 'Node': #  
         """ #  
@@ -46,23 +49,40 @@ class Node(): #  
             raise ValueError('Emission matrix is of incompatible size. Emission matrix has input size of {} but node has {} catagories'.format(emission_matrix.shape[1], self.number of catagories))
         # 
         #  create the connection
-        new_node = Node(number_of_catagories=emission_matrix.shape[0])
+        new_node = Node(number_of_catagories=emission_matrix.shape[0], is_root_node=False)
         effects.append(Effect(new_node, emission_matrix, None))
         # 
         #  return the new node
         return new_node
         # 
     # 
-    def solve_probabilities(self, prior: np.array) #  
+    def solve_probabilities(self, prior: np.array, *, supress_warnings=False) #  
         """ #  
-        Finds the conditional probability of every state of every node given the observations
+        Finds the conditional probability of every state of every node given the observations. Resulting probabilities are written to the 'distribution' attribute of each node
         """
+        # 
+        #   make sure we are at the root node!
+        if (not supress_warnings) and (not self.is_root_node):
+            raise warnings.warn('solve_probabilities was not called from the root node of the tree. This means that only a small subsection of the tree will be taken into account. This may lead to important information on different branches being ignored!\n To supress this warning in the future call the method with keyword argument supress_warnings set to True.')
         # 
         #  propagate the probability in two swoops!
         self.distribution = prior
         self.__bayes_propagate_up()
         self.__bayes_propagate_down()
         # 
+    # 
+    def create_random_state_observationless(self, *, supress_warnings=False): #  
+        """ #  
+        Create a completely random state of the causeal tree using a prior and the emission matricies ignoring observations. Resulting chosen catagories are written to the 'state' attribute of every node.
+
+        This function is primarily designed as a sanity check comparison for our other funcitions.
+        """
+        # 
+        #   warn if we are not the root node.
+        if (not supress_warnings) and (not self.is_root_node):
+            raise warnings.warn('create_random_state was not called from a non root node. Thie means that only the secton of the tree dependent on the node will be updated\n To supress this warning in the future call the method with keyword argument supress_warnings set to True.')
+        # 
+        #TODO
     # 
     def __bayes_propagate_up(self): #  
         """
